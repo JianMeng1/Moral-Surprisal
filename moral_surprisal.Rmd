@@ -1,0 +1,85 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+```{r}
+# Load libraries
+library(readxl)
+library(dplyr)
+
+# Read your data
+data <- read_excel("surprisal data.xlsx", sheet = 1)
+colnames(data) <- trimws(colnames(data))  # Clean up column names
+
+# Compute summary stats by condition
+summary_stats <- data %>%
+  group_by(item.type) %>%
+  summarise(
+    n = n(),
+    mean_surprisal = mean(Surprisal, na.rm = TRUE),
+    sd_surprisal = sd(Surprisal, na.rm = TRUE)
+  )
+
+# Print the result
+print(summary_stats)
+
+```
+
+```{r}
+# Load necessary libraries
+library(readxl)   # for reading Excel files
+library(dplyr)    # for data manipulation
+
+# Read the Excel file (assumes the data is in the first sheet)
+data <- read_excel("surprisal data.xlsx")
+
+# Optional: Check column names to make sure they match what you expect
+# colnames(data)
+
+# Filter surprisal values by item type
+surprisal_A <- filter(data, item.type == "A")$Surprisal
+surprisal_C <- filter(data, item.type == "C")$Surprisal
+
+# Perform t-test
+t_test_result <- t.test(surprisal_A, surprisal_C, alternative = "less")
+
+
+# Print result
+print(t_test_result)
+```
+
+
+```{r}
+# Load required packages
+library(ggplot2)
+library(readxl)
+library(dplyr)
+
+# Read your Excel data again (if needed)
+data <- read_excel("surprisal data.xlsx", sheet = 1)
+colnames(data) <- trimws(colnames(data))  # Clean column names
+
+# Boxplot
+ggplot(data %>% filter(item.type %in% c("A", "C")), 
+       aes(x = item.type, y = Surprisal, fill = item.type)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(
+    title = "Surprisal by Condition (A vs C)",
+    x = "Item Type",
+    y = "Surprisal"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("A" = "skyblue", "C" = "salmon"))
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
